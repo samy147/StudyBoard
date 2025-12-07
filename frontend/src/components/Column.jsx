@@ -1,14 +1,20 @@
 import Card from "./Card";
 
-export default function Column({ columnId, title, tasks, onUpdate, onDelete }) {
+export default function Column({ label, status, sessions}) {
   return (
-    <div className="kanban-column">
-      <h2>{title}</h2>
+    <div className="column">
+      <h2 className="column-title">{label}</h2>
 
-      <div className="kanban-list">
-        {tasks.map((task) => (
-          <Card key={task.id} task={task} onUpdate={onUpdate} onDelete={onDelete} />
+      <div className="column-content">
+        {/* on genere une Card pour chaque session */}
+        {sessions.map((session) => (
+          <Card key={session.id} session={session} />
         ))}
+
+        {/* Si aucune carte dans la colonne */}
+        {sessions.length === 0 && (
+            <p className="empty-column">Aucune séance ici.</p>
+        )}
       </div>
     </div>
   );
