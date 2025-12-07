@@ -21,6 +21,31 @@ export default function Card({ session}) {
         return colors[cm] ?? "#64748b";
     };
 
+    //supprimer une session
+    const handleDeleteSession = (id) => {
+        setSessions((prev) => prev.filter((s) => s.id !== id));
+    };
+
+    //changer le statut d'une session
+    const handleChangeStatus = (id, newStatus) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, status: newStatus } : s
+            )
+        );
+    };
+
+    //Modifer titre ou matiere
+    const handleEditSession = (id, updatedFields) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, ...updatedFields } : s
+            )
+        );
+    };
+
+
+
     return(
         <div className='card'>
             {/* Titre */}
