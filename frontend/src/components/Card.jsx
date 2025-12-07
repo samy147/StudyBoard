@@ -1,67 +1,47 @@
 import { useState } from 'react';
 
-export default function Card({ task, onUpdate, onDelete }) {
-  const [editing, setEditing] = useState(false);
+export default function Card({ session}) {
+    const getDifficultyColor = (level) => {
+        const colors = {
+            1: "#4CAF50", //facile
+            2: "#FF9800",  // moyen
+            3: "#F44336"   // difficile
+        };
+        return colors[level] ?? "#94a3b8";
+    };
 
-  const handleTitleChange = (e) => {
-    onUpdate(task.id, { title: e.target.value });
-  };
+    const getCMColor = (cm) => {
+        const colors = {
+            CM1: "#3b82f6",
+            CM2: "#8b5cf6",
+            CM3: "#ec4899",
+            CM4: "#f59e0b",
+            CM5: "#10b981"
+        };
+        return colors[cm] ?? "#64748b";
+    };
 
-  const handleTagChange = (e) => {
-    onUpdate(task.id, { tag: e.target.value });
-  };
+    return(
+        <div className='card'>
+            {/* Titre */}
+            <h3 className='card-title'>{session.title}</h3>
 
-  const handleAssigneeChange = (e) => {
-    onUpdate(task.id, { assignee: e.target.value });
-  };
+            {/*Badges */}
+            <div className='crad-badges'>
+                <span className='badge bagde-subject'>{session.subject}</span>
+                <span className="badge" style={{ backgroundColor: getCMColor(session.cm) }}>
+                    {session.cm}
+                </span>
 
-  return (
-    <div className="kanban-card">
-      <div className="card-main">
-        {editing ? (
-          <input
-            className="card-title-input"
-            value={task.title}
-            onChange={handleTitleChange}
-            onBlur={() => setEditing(false)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') setEditing(false);
-            }}
-            autoFocus
-          />
-        ) : (
-          <span 
-            onDoubleClick={() => setEditing(true)}
-            style={{ flex: 1, cursor: 'pointer' }}
-            title="Double-clic pour éditer"
-          >
-            {task.title}
-          </span>
-        )}
-        <button
-          className="kanban-delete"
-          onClick={() => onDelete(task.id)}
-          title="Supprimer la note"
-        >
-          ×
-        </button>
-      </div>
-
-      <div className="card-meta">
-        <select value={task.tag || ''} onChange={handleTagChange}>
-          <option value="">Sans tag</option>
-          <option value="⚠️ Urgent">⚠️ Urgent</option>
-          <option value="📚 Important">📚 Important</option>
-          <option value="Optionnel">Optionnel</option>
-        </select>
-
-        <input
-          type="text"
-          value={task.assignee || ''}
-          placeholder="Assigné à..."
-          onChange={handleAssigneeChange}
-        />
-      </div>
-    </div>
-  );
+                <span className="badge" style={{ backgroundColor: getDifficultyColor(session.difficulty) }}>
+                    Diff : {session.difficulty}
+                </span>
+            </div>
+            {/* Infos supplémentaires */}
+            <div className="card-info">
+                <p>📅 {new Date(session.dueDate).toLocaleDateString("fr-FR")}</p>
+                <p>⭐ {session.xp} XP</p>
+            </div>
+        </div>
+    );
 }
