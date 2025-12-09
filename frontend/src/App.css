@@ -218,18 +218,31 @@ h1, h2, h3 {
 }
 
 .stats-progress-bar {
-  height: 10px;
+  height: 12px;
   border-radius: 6px;
   background: #e2e8f0;
+  display: flex;
   overflow: hidden;
   margin-top: 0.5rem;
 }
 
 .stats-progress-fill {
   height: 100%;
-  background: #2563eb;
   transition: width 0.3s;
 }
+
+.stats-progress-fill.todo {
+  background-color: #2563eb; /* bleu pour todo */
+}
+
+.stats-progress-fill.doing {
+  background-color: #f59e0b; /* orange pour doing */
+}
+
+.stats-progress-fill.done {
+  background-color: #16a34a; /* vert pour done */
+}
+
 
 /* ============================
   FILTRES
