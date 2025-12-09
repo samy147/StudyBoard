@@ -30,3 +30,6 @@ coverage/
 
 # Archive de rendu
 *.zip
+
+script.py
+sortie.txt
