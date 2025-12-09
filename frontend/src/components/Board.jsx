@@ -21,8 +21,31 @@ export default function Board() {
         setSessions((prev) => [...prev, newSession]);
     };
 
+    //supprimer une session
+    const handleDeleteSession = (id) => {
+        setSessions((prev) => prev.filter((s) => s.id !== id));
+    };
+
+    //changer le statut d'une session
+    const handleChangeStatus = (id, newStatus) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, status: newStatus } : s
+            )
+        );
+    };
+
+    //Modifer titre ou matiere
+    const handleEditSession = (id, updatedFields) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, ...updatedFields } : s
+            )
+        );
+    };
+
     return (
-        <div className="board-container">
+        <div className="studyboard">
             {/*titre du board */}
             <h1>StudyBoard</h1>
 
@@ -30,7 +53,7 @@ export default function Board() {
             <AddSessionForm onAdd={handleAddSession}/>
 
             {/* Grille contnant les colonnes */}
-            <div className="columns-container">
+            <div className="studyboard-columns">
                 {columns.map((col) => (
                     <Column
                         key={col}
@@ -38,6 +61,9 @@ export default function Board() {
                         status={col}
                         //filtrer les sessions selon leur "status"
                         sessions={sessions.filter((s) => s.status == col)}
+                        onDelete={handleDeleteSession}
+                        onStatusChange={handleChangeStatus}
+                        onEdit={handleEditSession}
                     />
                 ))}
             </div>

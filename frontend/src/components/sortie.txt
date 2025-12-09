@@ -1,0 +1,259 @@
+import { useState } from "react";
+import { SUBJECTS, CMS, DIFFICULTIES, generateId } from "../mocks/mockSessions";
+
+//composant pour ajouter une nouvelle session
+export default function AddSessionForm({ onAdd }) {
+    //Etat pour chaque champ du formulaire
+    const [title, setTitle] = useState("");
+    const [subject, setSubject] = useState(SUBJECTS[0]);
+    const [status, setStatus] = useState("todo");
+    const [cm, setCm] = useState(CMS[0]);
+    const [difficulty, setDifficulty] = useState(1);
+    const [dueDate, setDueDate] = useState("");
+    const [xp, setXp] = useState(0);
+
+    //fonction pour gérer la soumission du formulaire
+    const handleSubmit = (e) => {
+        e.preventDefault(); //pour empecher le rechargement de la page
+        if(!title.trim()) return;
+
+        onAdd({
+            id: generateId(), //générer un id unique
+            title,
+            subject,
+            status,
+            cm,
+            difficulty: Number(difficulty), 
+            dueDate,
+            xp: Number(xp)
+        });
+
+        //réinitialiser les champs du formulaire pour le prochain ajout
+        setTitle("");
+        setDueDate("");
+        setXp(0);
+    };
+    return (
+        <form className="add-session-form" onSubmit={handleSubmit}>
+            {/* Champ pour le titre de la session */}
+            <input
+                type="text"
+                placeholder="Titre de la session"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+            />
+            {/*Choix du sujet */}
+            <select value={subject} onChange={(e) => setSubject(e.target.value)}>
+                {SUBJECTS.map((subj) => (
+                    <option key={subj} value={subj}>
+                        {subj}
+                    </option>
+                ))}
+            </select>
+            {/*Choix du statut */}
+            <select value={status} onChange={(e) => setStatus(e.target.value)}>
+                <option value="todo">À faire</option>
+                <option value="doing">En cours</option>
+                <option value="done">Terminé</option>
+            </select>
+            {/*Choix du CM */}
+            <select value={cm} onChange={(e) => setCm(e.target.value)}>
+                {CMS.map((cmOption) => (
+                    <option key={cmOption} value={cmOption}>
+                        {cmOption}
+                    </option>
+                ))}
+            </select>
+            {/*Choix de la difficulté */}
+            <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
+                {DIFFICULTIES.map((diff) => (
+                    <option key={diff.value} value={diff.value}>
+                        {diff.label}
+                    </option>
+                ))}
+            </select>
+            {/*Champ pour la date d'échéance */}
+            <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                required
+            />
+            {/*Champ pour les points d'expérience */}
+            <input
+                type="number"
+                placeholder="Points d'expérience"
+                value={xp}
+                onChange={(e) => setXp(e.target.value)}
+                min="0"
+                required
+            />
+            <button type="submit">Ajouter la session</button>
+        </form> 
+    );
+}
+import { useEffect, useState } from "react";
+import Column from "./Column";
+import AddSessionForm from "./AddSessionForm";
+import { mockSessions } from "../mocks/mockSessions";
+import "../App.css";
+
+const columns = ["todo", "doing", "done"];
+
+const labels = {
+  todo: "À faire",
+  doing: "En cours",
+  done: "Terminé",
+};
+
+
+export default function Board() {
+    // on stockes les sessions dans un state pour pouvoir effectuer les differentes operations
+    const [sessions, setSessions] = useState(mockSessions);
+
+    const handleAddSession = (newSession) => {
+        setSessions((prev) => [...prev, newSession]);
+    };
+
+    //supprimer une session
+    const handleDeleteSession = (id) => {
+        setSessions((prev) => prev.filter((s) => s.id !== id));
+    };
+
+    //changer le statut d'une session
+    const handleChangeStatus = (id, newStatus) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, status: newStatus } : s
+            )
+        );
+    };
+
+    //Modifer titre ou matiere
+    const handleEditSession = (id, updatedFields) => {
+        setSessions((prev) =>
+            prev.map((s) =>
+                s.id === id ? { ...s, ...updatedFields } : s
+            )
+        );
+    };
+
+    return (
+        <div className="board-container">
+            {/*titre du board */}
+            <h1>StudyBoard</h1>
+
+            {/*Formulaire d'ajout*/}
+            <AddSessionForm onAdd={handleAddSession}/>
+
+            {/* Grille contnant les colonnes */}
+            <div className="columns-container">
+                {columns.map((col) => (
+                    <Column
+                        key={col}
+                        label={labels[col]}
+                        status={col}
+                        //filtrer les sessions selon leur "status"
+                        sessions={sessions.filter((s) => s.status == col)}
+                        onDelete={handleDeleteSession}
+                        onStatusChange={handleChangeStatus}
+                        onEdit={handleEditSession}
+                    />
+                ))}
+            </div>
+        </div>
+    );
+}
+import { useState } from 'react';
+
+export default function Card({ session, onDelete, onStatusChange, onEdit}) {
+    const getDifficultyColor = (level) => {
+        const colors = {
+            1: "#4CAF50", //facile
+            2: "#FF9800",  // moyen
+            3: "#F44336"   // difficile
+        };
+        return colors[level] ?? "#94a3b8";
+    };
+
+    const getCMColor = (cm) => {
+        const colors = {
+            CM1: "#3b82f6",
+            CM2: "#8b5cf6",
+            CM3: "#ec4899",
+            CM4: "#f59e0b",
+            CM5: "#10b981"
+        };
+        return colors[cm] ?? "#64748b";
+    };
+
+    return(
+        <div className='card'>
+            {/* Titre */}
+            <h3 className='card-title'>{session.title}</h3>
+
+            {/*Badges */}
+            <div className='crad-badges'>
+                <span className='badge bagde-subject'>{session.subject}</span>
+                <span className="badge" style={{ backgroundColor: getCMColor(session.cm) }}>
+                    {session.cm}
+                </span>
+
+                <span className="badge" style={{ backgroundColor: getDifficultyColor(session.difficulty) }}>
+                    Diff : {session.difficulty}
+                </span>
+            </div>
+            {/* Infos supplémentaires */}
+            <div className="card-info">
+                <p>📅 {new Date(session.dueDate).toLocaleDateString("fr-FR")}</p>
+                <p>⭐ {session.xp} XP</p>
+            </div>
+
+            { /* Actions */}
+            <div className="card-actions">
+                {/* Changer le statut */}
+                <button onClick={() => onStatusChange(session.id, "todo")}>🟦</button>
+                <button onClick={() => onStatusChange(session.id, "doing")}>🟧</button>
+                <button onClick={() => onStatusChange(session.id, "done")}>🟩</button>
+
+                {/* Modifier */}
+                <button onClick={() => {
+                    const newTitle = prompt("Nouveau titre :", session.title);
+                    if (newTitle.trim() && newTitle) onEdit(session.id, { title: newTitle });
+                }}>
+                    ✏️
+                </button>
+
+                {/* Supprimer */}
+                <button onClick={() => onDelete(session.id)}>🗑️</button>
+            </div>
+        </div>
+    );
+}import Card from "./Card";
+
+export default function Column({ label, status, sessions, onDelete, onStatusChange, onEdit}) {
+  return (
+    <div className="column">
+      <h2 className="column-title">{label}</h2>
+
+      <div className="column-content">
+        {/* on genere une Card pour chaque session */}
+        {sessions.map((session) => (
+        <Card 
+            key={session.id} 
+            session={session} 
+            onDelete={onDelete}
+            onStatusChange={onStatusChange}
+            onEdit={onEdit}
+        />
+        ))}
+
+        {/* Si aucune carte dans la colonne */}
+        {sessions.length === 0 && (
+            <p className="empty-column">Aucune séance ici.</p>
+        )}
+      </div>
+    </div>
+  );
+}

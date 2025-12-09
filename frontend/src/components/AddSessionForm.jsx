@@ -34,7 +34,7 @@ export default function AddSessionForm({ onAdd }) {
         setXp(0);
     };
     return (
-        <form className="add-session-form" onSubmit={handleSubmit}>
+        <form className="study-form" onSubmit={handleSubmit}>
             {/* Champ pour le titre de la session */}
             <input
                 type="text"
