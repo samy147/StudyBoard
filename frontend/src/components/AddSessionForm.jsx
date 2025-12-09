@@ -30,6 +30,10 @@ export default function AddSessionForm({ onAdd }) {
 
         //réinitialiser les champs du formulaire pour le prochain ajout
         setTitle("");
+        setSubject(SUBJECTS[0])
+        setStatus("todo")
+        setCm(CMS[0])
+        setDifficulty(1);
         setDueDate("");
         setXp(0);
     };

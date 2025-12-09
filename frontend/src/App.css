@@ -195,3 +195,53 @@ h1, h2, h3 {
     grid-template-columns: 1fr;
   }
 }
+
+.stats-panel {
+  background: #ffffff;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.stats-panel h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #0f172a;
+}
+
+.stats-panel p {
+  margin: 0.3rem 0;
+  color: #475569;
+  font-weight: 500;
+}
+
+.stats-progress-bar {
+  height: 10px;
+  border-radius: 6px;
+  background: #e2e8f0;
+  overflow: hidden;
+  margin-top: 0.5rem;
+}
+
+.stats-progress-fill {
+  height: 100%;
+  background: #2563eb;
+  transition: width 0.3s;
+}
+
+/* ============================
+  FILTRES
+============================ */
+.studyboard > div > input,
+.studyboard > div > select {
+    padding: 0.5rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #f8fafc;
+    font-size: 0.9rem;
+    margin-right: 0.5rem; /* un petit espace entre eux */
+}
+
+

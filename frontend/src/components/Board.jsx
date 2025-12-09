@@ -93,6 +93,7 @@ export default function Board() {
                 />
             </div>
 
+            <StatsPanel sessions={filteredSessions} />
             {/* Grille contnant les colonnes */}
             <div className="studyboard-columns">
                 {columns.map((col) => (
@@ -101,14 +102,13 @@ export default function Board() {
                         label={labels[col]}
                         status={col}
                         //filtrer les sessions selon leur "status"
-                        sessions={sessions.filter((s) => s.status == col)}
+                        sessions={filteredSessions.filter((s) => s.status == col)}
                         onDelete={handleDeleteSession}
                         onStatusChange={handleChangeStatus}
                         onEdit={handleEditSession}
                     />
                 ))}
             </div>
-            <StatsPanel sessions={filteredSessions} />
         </div>
     );
 }
