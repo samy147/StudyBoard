@@ -16,8 +16,25 @@ const labels = {
 
 export default function Board() {
     // on stockes les sessions dans un state pour pouvoir effectuer les differentes operations
-    const [sessions, setSessions] = useState(mockSessions);
+    //const [sessions, setSessions] = useState(mockSessions);
 
+    const [sessions, setSessions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        fetch("/api/sessions")
+        .then(res => res.json())
+        .then(data => {
+            setSessions(data);
+            setLoading(false);
+        })
+        .catch(err => {
+            console.error(err);
+            setError("Erreur lors du chargement des séances.");
+            setLoading(false);
+        });
+    }, []);
     //etats pour les filtres
     const [filterSubject, setFilterSubject] = useState("");
     const [filterCM, setFilterCM] = useState("");
@@ -25,29 +42,62 @@ export default function Board() {
     const [searchText, setSearchText] = useState("");
 
 
-    const handleAddSession = (newSession) => {
-        setSessions((prev) => [...prev, newSession]);
+    const handleAddSession = async (newSession) => {
+        const response = await fetch("/api/sessions", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newSession),
+        });
+        const createdSession = await response.json();
+
+        setSessions((prev) => [...prev, crezatedSession]);
     };
 
     //supprimer une session
-    const handleDeleteSession = (id) => {
+    const handleDeleteSession = async(id) => {
+        await fetch(`/api/sessions/${id}`, {
+            method: "DELETE",
+        });
+
         setSessions((prev) => prev.filter((s) => s.id !== id));
     };
 
     //changer le statut d'une session
-    const handleChangeStatus = (id, newStatus) => {
+    const handleChangeStatus = async (id, newStatus) => {
+        const res = await fetch(`/api/sessions/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ status: newStatus }),
+        });
+
+        const updated = await res.json();
+
         setSessions((prev) =>
             prev.map((s) =>
-                s.id === id ? { ...s, status: newStatus } : s
+                s.id === id ? updated : s
             )
         );
     };
 
     //Modifer titre ou matiere
-    const handleEditSession = (id, updatedFields) => {
+    const handleEditSession = async (id, updatedFields) => {
+        const res = await fetch(`/api/sessions/${id}`, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(updatedFields),
+        });
+
+        const updated = await res.json();
+
         setSessions((prev) =>
             prev.map((s) =>
-                s.id === id ? { ...s, ...updatedFields } : s
+                s.id === id ? updated : s
             )
         );
     };
