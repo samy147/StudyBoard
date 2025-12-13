@@ -43,63 +43,83 @@ export default function Board() {
 
 
     const handleAddSession = async (newSession) => {
-        const response = await fetch("/api/sessions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(newSession),
-        });
-        const createdSession = await response.json();
-
-        setSessions((prev) => [...prev, crezatedSession]);
+        try {
+            const response = await fetch("/api/sessions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(newSession),
+            });
+            if (!response.ok) throw new Error('Erreur lors de la création');
+            const createdSession = await response.json();
+            setSessions((prev) => [...prev, createdSession]);
+        } catch (err) {
+            console.error(err);
+            setError("Impossible d'ajouter la séance. Vérifiez votre connexion.");
+        }
     };
 
     //supprimer une session
     const handleDeleteSession = async(id) => {
-        await fetch(`/api/sessions/${id}`, {
-            method: "DELETE",
-        });
-
-        setSessions((prev) => prev.filter((s) => s.id !== id));
+        try {
+            const response = await fetch(`/api/sessions/${id}`, {
+                method: "DELETE",
+            });
+            if (!response.ok) throw new Error('Erreur lors de la suppression');
+            setSessions((prev) => prev.filter((s) => s.id !== id));
+        } catch (err) {
+            console.error(err);
+            setError("Impossible de supprimer la séance.");
+        }
     };
 
     //changer le statut d'une session
     const handleChangeStatus = async (id, newStatus) => {
-        const res = await fetch(`/api/sessions/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ status: newStatus }),
-        });
+        try {
+            const res = await fetch(`/api/sessions/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if (!res.ok) throw new Error('Erreur lors de la mise à jour');
+            const updated = await res.json();
 
-        const updated = await res.json();
-
-        setSessions((prev) =>
-            prev.map((s) =>
-                s.id === id ? updated : s
-            )
-        );
+            setSessions((prev) =>
+                prev.map((s) =>
+                    s.id === id ? updated : s
+                )
+            );
+        } catch (err) {
+            console.error(err);
+            setError("Impossible de changer le statut.");
+        }
     };
 
     //Modifer titre ou matiere
     const handleEditSession = async (id, updatedFields) => {
-        const res = await fetch(`/api/sessions/${id}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(updatedFields),
-        });
+        try {
+            const res = await fetch(`/api/sessions/${id}`, {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(updatedFields),
+            });
+            if (!res.ok) throw new Error('Erreur lors de la modification');
+            const updated = await res.json();
 
-        const updated = await res.json();
-
-        setSessions((prev) =>
-            prev.map((s) =>
-                s.id === id ? updated : s
-            )
-        );
+            setSessions((prev) =>
+                prev.map((s) =>
+                    s.id === id ? updated : s
+                )
+            );
+        } catch (err) {
+            console.error(err);
+            setError("Impossible de modifier la séance.");
+        }
     };
 
     //filtrer les sessions
@@ -113,52 +133,67 @@ export default function Board() {
     return (
         <div className="studyboard">
             {/*titre du board */}
-            <h1>StudyBoard</h1>
+            <h1>📚 StudyBoard</h1>
 
-            {/*Formulaire d'ajout*/}
-            <AddSessionForm onAdd={handleAddSession}/>
+            {/* Message d'erreur */}
+            {error && (
+                <div className="error-banner">
+                    <span>{error}</span>
+                    <button onClick={() => setError(null)}>✕</button>
+                </div>
+            )}
 
-            {/* Filtres */}
-            <div>
-                <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)}>
-                    <option value="">Toutes les matières</option>
-                    {SUBJECTS.map(subj => <option key={subj} value={subj}>{subj}</option>)}
-                    </select>
+            {/* État de chargement */}
+            {loading ? (
+                <div className="loading">⏳ Chargement des séances...</div>
+            ) : (
+                <>
+                    {/*Formulaire d'ajout*/}
+                    <AddSessionForm onAdd={handleAddSession}/>
 
-                    <select value={filterCM} onChange={e => setFilterCM(e.target.value)}>
-                    <option value="">Tous les CM</option>
-                    {CMS.map(cm => <option key={cm} value={cm}>{cm}</option>)}
-                </select>
+                    {/* Filtres */}
+                    <div className="filters">
+                        <select value={filterSubject} onChange={e => setFilterSubject(e.target.value)}>
+                            <option value="">Toutes les matières</option>
+                            {SUBJECTS.map(subj => <option key={subj} value={subj}>{subj}</option>)}
+                        </select>
 
-                <select value={filterDifficulty} onChange={e => setFilterDifficulty(e.target.value)}>
-                    <option value="">Toutes difficultés</option>
-                    {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
-                </select>
+                        <select value={filterCM} onChange={e => setFilterCM(e.target.value)}>
+                            <option value="">Tous les CM</option>
+                            {CMS.map(cm => <option key={cm} value={cm}>{cm}</option>)}
+                        </select>
 
-                <input
-                type="text"
-                placeholder="Rechercher par titre"
-                value={searchText}
-                onChange={e => setSearchText(e.target.value)}
-                />
-            </div>
+                        <select value={filterDifficulty} onChange={e => setFilterDifficulty(e.target.value)}>
+                            <option value="">Toutes difficultés</option>
+                            {DIFFICULTIES.map(d => <option key={d.value} value={d.value}>{d.label}</option>)}
+                        </select>
 
-            <StatsPanel sessions={filteredSessions} />
-            {/* Grille contnant les colonnes */}
-            <div className="studyboard-columns">
-                {columns.map((col) => (
-                    <Column
-                        key={col}
-                        label={labels[col]}
-                        status={col}
-                        //filtrer les sessions selon leur "status"
-                        sessions={filteredSessions.filter((s) => s.status == col)}
-                        onDelete={handleDeleteSession}
-                        onStatusChange={handleChangeStatus}
-                        onEdit={handleEditSession}
-                    />
-                ))}
-            </div>
+                        <input
+                            type="text"
+                            placeholder="Rechercher par titre"
+                            value={searchText}
+                            onChange={e => setSearchText(e.target.value)}
+                        />
+                    </div>
+
+                    <StatsPanel sessions={filteredSessions} />
+                    {/* Grille contenant les colonnes */}
+                    <div className="studyboard-columns">
+                        {columns.map((col) => (
+                            <Column
+                                key={col}
+                                label={labels[col]}
+                                status={col}
+                                //filtrer les sessions selon leur "status"
+                                sessions={filteredSessions.filter((s) => s.status == col)}
+                                onDelete={handleDeleteSession}
+                                onStatusChange={handleChangeStatus}
+                                onEdit={handleEditSession}
+                            />
+                        ))}
+                    </div>
+                </>
+            )}
         </div>
     );
 }

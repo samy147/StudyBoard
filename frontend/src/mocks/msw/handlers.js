@@ -12,10 +12,14 @@ export const handlers = [
         const data = await request.json();
 
         const newSession = {
-        id: crypto.randomUUID(),
-        title: data.title || "Untitled",
-        subject: data.subject || "",
-        status: data.status || "todo"
+            id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+            title: data.title || "Untitled",
+            subject: data.subject || "",
+            status: data.status || "todo",
+            cm: data.cm || "CM1",
+            difficulty: data.difficulty || 1,
+            dueDate: data.dueDate || "",
+            xp: data.xp || 0
         };
 
         mockSessions.push(newSession);

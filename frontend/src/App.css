@@ -257,4 +257,61 @@ h1, h2, h3 {
     margin-right: 0.5rem; /* un petit espace entre eux */
 }
 
+/* ============================
+   ⚡ ERREURS & ÉTATS
+============================ */
+.error-banner {
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #991b1b;
+    font-weight: 500;
+}
+
+.error-banner button {
+    background: none;
+    border: none;
+    color: #991b1b;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0;
+}
+
+.error-banner button:hover {
+    opacity: 0.7;
+}
+
+.loading {
+    text-align: center;
+    padding: 2rem;
+    font-size: 1.1rem;
+    color: #475569;
+    font-weight: 500;
+}
+
+.filters {
+    display: flex;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.filters select,
+.filters input {
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+}
+
+.filters input {
+    min-width: 200px;
+}
 
