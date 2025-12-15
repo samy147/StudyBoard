@@ -1,7 +1,7 @@
 // server.js
 import express from "express";
 import cors from "cors";
-import { mockSessions } from "./mockSessions.js"; // ton fichier mockSessions
+import { mockSessions } from "./mockSessions.js"; //fichier mockSessions
 
 const app = express();
 app.use(cors());          // pour autoriser Postman ou ton frontend
