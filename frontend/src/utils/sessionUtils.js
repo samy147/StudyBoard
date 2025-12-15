@@ -1,7 +1,4 @@
-/**
- * Utilitaire de filtrage des sessions
- * Utilisé par le Board pour filtrer selon les critères
- */
+// Utilitaires pour filtrer et analyser les sessions
 
 export function filterSessions(sessions, filters) {
   return sessions.filter(s => 

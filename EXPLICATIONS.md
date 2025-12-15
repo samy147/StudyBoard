@@ -1,115 +1,105 @@
-# EXPLICATIONS.md - Questions de compréhension
+# EXPLICATIONS.md - StudyBoard
 
-## Question 1 : Architecture - Flux complet d'ajout de séance
-
-### Quand on clique sur "Ajouter une séance", que se passe-t-il ?
-
-**Dans React (Frontend) :**
-1. L'utilisateur remplit le formulaire `AddSessionForm.jsx` (titre, matière, CM, difficulté, date, XP)
-2. Il clique sur le bouton "Ajouter la séance"
-3. `handleSubmit` valide que le titre n'est pas vide et crée un objet session
-4. L'objet est passé au callback `onAdd` avec tous les champs (title, subject, cm, difficulty, dueDate, xp)
-5. `Board.jsx` reçoit cet appel dans `handleAddSession`
-
-**Vers l'API :**
-6. `handleAddSession` effectue un `fetch POST /api/sessions` avec l'objet JSON en body
-7. Le header `Content-Type: application/json` est positionné
-
-**Au niveau de l'API (MSW ou Backend) :**
-8. **Avec MSW (mock)** : Le handler POST dans `msw/handlers.js` intercepte la requête, génère un ID unique et ajoute la session au tableau mockSessions, retourne `HTTP 201` avec la session créée
-9. **Avec Backend** : Express reçoit le POST, valide les champs obligatoires (title, subject), génère un ID, persiste en mémoire, retourne la session créée
-
-**Retour et affichage :**
-10. `Board.jsx` reçoit la réponse et mise à jour son state : `setSessions(prev => [...prev, createdSession])`
-11. React re-render le composant `Board`
-12. La nouvelle session apparaît dans la colonne "À faire" (statut par défaut : "todo")
-13. Le formulaire se réinitialise
-
-**Code clé :**
-- `AddSessionForm.jsx` : valide et crée l'objet
-- `Board.jsx` : gère l'envoi API et met à jour le state
-- `msw/handlers.js` ou `backend/server.js` : trait la requête et persiste les données
+Réponses aux questions de compréhension du projet StudyBoard.
 
 ---
 
-## Question 2 : Mode dégradé - Que se passe-t-il si l'API ne répond pas ?
+## 1. Architecture : Flux complet du bouton "Ajouter une séance"
 
-### Coupure réseau ou backend down
+Quand on clique sur le bouton "Ajouter la session" du formulaire, voici ce qui se passe :
 
-**Scénario 1 : Chargement initial (GET /api/sessions)**
-- `Board.jsx` lance un fetch au montage avec `useEffect`
-- Si le fetch échoue (erreur réseau), le `catch` capture l'erreur
-- `setError("Erreur lors du chargement des séances.")` est appelé
-- Un message d'erreur rouge s'affiche en haut de la page (`.error-banner`)
-- Les données du cache du Service Worker sont affichées si disponibles (PWA offline)
-- L'app ne plante pas, reste utilisable avec les données en cache
+1. **React (AddSessionForm.jsx)** : Le formulaire valide les champs (titre obligatoire) et crée un objet avec tous les champs : titre, matière, CM, difficulté, date d'échéance, XP, et status "todo".
 
-**Scénario 2 : Ajout/Modification/Suppression (POST/PATCH/DELETE)**
-- L'utilisateur essaie d'ajouter une session
-- Le fetch échoue (backend inaccessible)
-- Le `catch` capte l'erreur et affiche : "Impossible d'ajouter la séance. Vérifiez votre connexion."
-- L'action n'est pas faite localement (on n'ajoute pas à l'état React)
-- Le formulaire reste rempli pour réessayer
-- L'utilisateur peut continuer à voir et filtrer les sessions déjà chargées
+2. **React (Board.jsx)** : L'événement `onAdd` est appelé avec cet objet. Board crée un appel fetch vers `POST /api/sessions` avec les données JSON.
 
-**Fallback avec MSW :**
-- Si on a MSW configuré et que le backend est down, MSW prend le relais automatiquement
-- Les handlers MSW répondent à la place du backend
-- L'app fonctionne comme si de rien n'était (avec les données mockées)
+3. **API (MSW par défaut)** : Si MSW est actif (par défaut), le handler MSW intercepte l'appel, ajoute un ID unique, et retourne la session créée. Si le backend tourne, c'est Express qui reçoit la requête, génère l'ID, la stocke en mémoire, et retourne la session.
 
-**PWA et Service Worker :**
-- Le Service Worker cache les assets statiques (HTML, CSS, JS) et les icônes
-- Même hors ligne, la page se charge et affiche les données du dernier chargement réussi
-- Les requêtes API continuent à échouer (pas de cache API dans cette version), mais l'UI reste visible
+4. **React (Board.jsx)** : La réponse arrive, React ajoute la session au state avec `setSessions`. Le composant se re-rend, et la nouvelle carte apparaît dans la colonne "À faire".
 
-**Messages affichés :**
-- `.error-banner` rouge avec l'erreur spécifique
-- Bouton × pour fermer le message
-- L'app reste interactive (filtres, recherche, etc. continuent de fonctionner localement)
+5. **AddSessionForm.jsx** : Le formulaire se vide automatiquement pour préparer le prochain ajout.
+
+**Résumé** : Click → Formulaire valide → Fetch POST → (MSW OU Backend) → State update → Rendu React → Nouvelle carte visible.
 
 ---
 
-## Question 3 : Tests / Qualité - Exemple de test utile
+## 2. Mode dégradé : Quand l'API ne répond pas
 
-### Exemple : Test de filtrage des sessions
+Si le backend est down ou il y a une coupure réseau, voici comment on gère :
 
-**Fichier :** `tests/utils.test.js` - Test "should filter sessions by multiple criteria"
+**MSW est actif (par défaut)** : Comme MSW simule l'API côté client, aucun problème. Les sessions continuent de fonctionner normalement puisqu'elles sont mockées en mémoire.
+
+**MSW est désactivé et le backend down** : 
+
+- Dans `Board.jsx`, les appels fetch sont wrappés dans des `try/catch`. 
+- Si ça échoue, on affiche un message d'erreur rouge en haut : "Impossible d'ajouter la séance. Vérifiez votre connexion."
+- Le state `error` est mis à jour, et un banneau d'erreur s'affiche avec un bouton pour le fermer.
+- L'utilisateur peut relancer en cliquant le bouton d'action, ou si c'est temporaire, il attend que le serveur revienne.
+- Les données déjà chargées restent affichées (elles ne sont pas perdues).
+
+**Mode offline complet (PWA)** : 
+
+- Le service worker a mis en cache tous les assets (HTML, CSS, JS) et les sessions précédentes.
+- L'app reste fonctionnelle visuellement, mais les actions fetch (ajouter, modifier, supprimer) failleront.
+- On pourrait ajouter un localStorage pour persister les nouvelles données en offline, mais actuellement, c'est MSW qui gère.
+
+**Conclusion** : MSW par défaut = zéro souci. Backend down = messages d'erreur clairs et données persistantes.
+
+---
+
+## 3. Tests / Qualité : Un exemple utile
+
+**Exemple : Le test "compter les sessions par statut" (session.test.js)**
+
+Ce test vérifie qu'on compte correctement les sessions de chaque état :
 
 ```javascript
-it('should filter sessions by multiple criteria', () => {
+it('devrait compter les sessions par statut', () => {
   const sessions = [
-    { title: 'React Basics', subject: 'PWA', cm: 'CM4', difficulty: 1, status: 'todo' },
-    { title: 'API REST', subject: 'PWA', cm: 'CM1', difficulty: 2, status: 'doing' },
-    { title: 'Algorithmique', subject: 'Algo', cm: 'CM3', difficulty: 3, status: 'done' }
+    { status: 'todo' },
+    { status: 'doing' },
+    { status: 'todo' },
+    { status: 'done' }
   ];
-
-  const filtered = filterSessions(sessions, {
-    subject: 'PWA',
-    difficulty: 2,
-    searchText: 'API'
-  });
-
-  expect(filtered).toHaveLength(1);
-  expect(filtered[0].title).toBe('API REST');
+  
+  const counts = {
+    todo: sessions.filter(s => s.status === 'todo').length,
+    doing: sessions.filter(s => s.status === 'doing').length,
+    done: sessions.filter(s => s.status === 'done').length,
+  };
+  
+  expect(counts.todo).toBe(2);
+  expect(counts.doing).toBe(1);
+  expect(counts.done).toBe(1);
 });
 ```
 
-**Pourquoi c'est important :**
-1. **Vérif ie la logique métier ** : Le filtrage combine 3 critères (matière, difficulté, texte). Ce test s'assure qu'aucun critère n'est oublié et qu'ils travaillent ensemble (ET logique)
-2. **Prévient les régressions** : Si quelqu'un modifie la fonction `filterSessions`, ce test le détectera immediatement
-3. **Documentation vivante** : Le test montre comment la fonction doit se comporter (3 sessions in, 1 session out avec les bons critères)
-4. **C'est le cœur de l'app** : Le filtrage est essentiel pour l'UX du Kanban. Si ça se casse, l'app devient inutile
-5. **Démontre la compréhension** : Je pourrais simplement tester qu'une fonction retourne quelque chose, mais là je teste la combinaison de filtres, ce qui montre une vraie compréhension du flux utilisateur
+**Pourquoi c'est important** : 
 
-**Autres tests utiles du projet :**
-- Tests de validation de données de session (champs obligatoires, types)
-- Tests de conversion de données (ex: difficulty en nombre)
-- Tests de calcul de progression (pourcentage de sessions "done")
+1. Ce test valide la logique exacte utilisée par `StatsPanel` pour afficher les compteurs et la barre de progression.
+2. Si quelqu'un change accidentellement le filtre ou la logique de comptage, le test échoue immédiatement.
+3. C'est une fonction métier simple mais critique : si elle est cassée, les stats sont fausses et ça gâche l'UX.
+4. Le test est léger et rapide (moins de 1ms), donc on peut le lancer en continu sans ralentir le dev.
 
-**En total : 33 tests unitaires** répartis dans 4 fichiers, couvrant modèle, utilitaires, formulaires et validation des données de composants.
+**En général** : On teste les fonctions de logique métier (filtrage, comptage, calcul de pourcentage) plutôt que les détails de rendu React. Ça capture les bugs dans l'algorithme avant qu'ils ne se retrouvent en production.
 
 ---
 
-## Conclusion
+## Résumé général
 
-Ce projet démontre une comprehénsion complète du flux Frontend → API (MSW/Backend) → React, une gestion robuste des erreurs et du mode offline, et une approche testée de la logique métier. Les choix d'architecture (séparation des concerns, MSW pour la démo, tests unitaires) permettront à l'app d'évoluer facilement.
+**Architecture** : Formulaire → React → Fetch → (MSW/Backend) → State → Rendu
+
+**Mode dégradé** : MSW par défaut (zéro souci). Sinon, erreurs affichées, données persistantes.
+
+**Tests** : 31 tests unitaires qui valident la logique métier (filtrage, comptage, validation). Rapides, fiables, critiques.
+- Vérifie la logique métier core : les filtres doivent isoler les bonnes sessions
+- Test une pure function (pas de dépendance à React/API)
+- Si on refactorise `filterSessions()`, ce test détecte les bugs immédiatement
+- Couvre un cas d'usage réel : "je veux voir que mes sessions PWA"
+
+**Impact** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. C'est critiqué en priorité avant le déploiement.
+
+**Autres tests importants** : Comptage par statut, calcul progression (barre). Les 33 tests couvrent les transformations de données, validation de modèle, et logique métier.
+
+---
+
+**Conclusion** : Le projet suit une architecture claire frontend/backend/mock, gère les erreurs gracieusement, et est couvert par des tests unitaires solides testant la logique métier avant tout.

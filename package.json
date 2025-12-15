@@ -1,0 +1,16 @@
+{
+  "name": "studyboard",
+  "version": "1.0.0",
+  "description": "Kanban PWA pour révisions",
+  "scripts": {
+    "test": "vitest",
+    "test:run": "vitest --run",
+    "test:ui": "vitest --ui"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^15.0.0",
+    "@vitejs/plugin-react": "^5.1.1",
+    "jsdom": "^24.0.0",
+    "vitest": "^1.0.4"
+  }
+}

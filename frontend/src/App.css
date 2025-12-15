@@ -1,6 +1,4 @@
-/* ============================
-   ⚡ GLOBAL
-============================ */
+/* global */
 body {
   margin: 0;
   font-family: "Inter", sans-serif;
@@ -13,9 +11,7 @@ h1, h2, h3 {
   font-weight: 600;
 }
 
-/* ============================
-   ⚡ STUDYBOARD
-============================ */
+/* studyboard*/
 
 .studyboard {
   width: 100%;
@@ -31,9 +27,7 @@ h1, h2, h3 {
   color: #0f172a;
 }
 
-/* ============================
-   ⚡ FORMULAIRE
-============================ */
+/* formulaire*/
 .study-form {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -69,9 +63,7 @@ h1, h2, h3 {
   background: #1e40af;
 }
 
-/* ============================
-   ⚡ COLONNES
-============================ */
+/* colonnes*/
 .studyboard-columns {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -106,9 +98,7 @@ h1, h2, h3 {
   padding: 1rem;
 }
 
-/* ============================
-   ⚡ CARDS
-============================ */
+/* cards*/
 
 .study-card {
   background: #f8fafc;
@@ -129,9 +119,7 @@ h1, h2, h3 {
   color: #0f172a;
 }
 
-/* -----------------------------
-   🔹 BADGES
------------------------------ */
+/* badges */
 .study-card-badges {
   display: flex;
   gap: 0.4rem;
@@ -151,9 +139,7 @@ h1, h2, h3 {
   background: #0ea5e9;
 }
 
-/* -----------------------------
-   🔹 INFOS
------------------------------ */
+/* infos*/
 .study-card-info {
   font-size: 0.85rem;
   color: #475569;
@@ -164,9 +150,7 @@ h1, h2, h3 {
   margin: 0.2rem 0;
 }
 
-/* -----------------------------
-   🔹 ACTIONS
------------------------------ */
+/*  Action*/
 .study-card-actions {
   display: flex;
   justify-content: space-between;
@@ -187,9 +171,7 @@ h1, h2, h3 {
   background: #e2e8f0;
 }
 
-/* ============================
-   ⚡ RESPONSIVE
-============================ */
+/* responsive */
 @media (max-width: 900px) {
   .studyboard-columns {
     grid-template-columns: 1fr;
@@ -244,9 +226,7 @@ h1, h2, h3 {
 }
 
 
-/* ============================
-  FILTRES
-============================ */
+/* filtres*/
 .studyboard > div > input,
 .studyboard > div > select {
     padding: 0.5rem;
@@ -257,9 +237,7 @@ h1, h2, h3 {
     margin-right: 0.5rem; /* un petit espace entre eux */
 }
 
-/* ============================
-   ⚡ ERREURS & ÉTATS
-============================ */
+/* erreurs et etats*/
 .error-banner {
     background: #fee2e2;
     border: 1px solid #fca5a5;

@@ -2,15 +2,17 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
-//Activation si ?msw=on OU localStorage.msw === "on"
+// Activation MSW seulement si ?msw=on dans l'URL
 async function activerMSW() {
     const params = new URLSearchParams(window.location.search);
-    const force = params.get('msw') === "on" || localStorage.getItem('msw') === "on";
+    const activer = params.get('msw') === "on";
 
-    if (force) {
+    if (activer) {
         const { worker } = await import('./mocks/msw/browser.js');
         await worker.start();
-        console.log("MSW activé");
+        console.log('✓ MSW activé - mode mock API');
+    } else {
+        console.log('MSW désactivé - utilisation du backend réel ou mode offline');
     }
 }
 

@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Données initiales (pour la démo)
+// Exemple de données en mémoire
 let sessions = [
     {
         id: "1",

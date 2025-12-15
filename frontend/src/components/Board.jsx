@@ -13,6 +13,8 @@ const labels = {
   done: "Terminé",
 };
 
+// API relative : MSW l'intercepte quand ?msw=on, sinon proxy vers backend
+const API_URL = "/api/sessions";
 
 export default function Board() {
     // on stockes les sessions dans un state pour pouvoir effectuer les differentes operations
@@ -23,7 +25,7 @@ export default function Board() {
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetch("/api/sessions")
+        fetch(API_URL)
         .then(res => res.json())
         .then(data => {
             setSessions(data);
@@ -44,7 +46,7 @@ export default function Board() {
 
     const handleAddSession = async (newSession) => {
         try {
-            const response = await fetch("/api/sessions", {
+            const response = await fetch(API_URL, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -63,7 +65,7 @@ export default function Board() {
     //supprimer une session
     const handleDeleteSession = async(id) => {
         try {
-            const response = await fetch(`/api/sessions/${id}`, {
+            const response = await fetch(`${API_URL}/${id}`, {
                 method: "DELETE",
             });
             if (!response.ok) throw new Error('Erreur lors de la suppression');
@@ -77,7 +79,7 @@ export default function Board() {
     //changer le statut d'une session
     const handleChangeStatus = async (id, newStatus) => {
         try {
-            const res = await fetch(`/api/sessions/${id}`, {
+            const res = await fetch(`${API_URL}/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
@@ -101,7 +103,7 @@ export default function Board() {
     //Modifer titre ou matiere
     const handleEditSession = async (id, updatedFields) => {
         try {
-            const res = await fetch(`/api/sessions/${id}`, {
+            const res = await fetch(`${API_URL}/${id}`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json",
