@@ -16,28 +16,64 @@ StudyBoard/
 
 ## Installation & Lancement
 
-### Frontend (React avec Vite)
+### Option 1 : Mode MSW (Mock API - SANS backend)
+
+Idéal pour développer et tester sans serveur :
 
 ```bash
 cd frontend
-npm create vite@latest . -- --template react
 npm install
-npm install msw --save-dev
 npm run dev
 ```
 
-Le frontend démarre sur `http://localhost:5173`
+Accédez à **`http://localhost:5173/?msw=on`** (avec le paramètre `?msw=on`)
 
-### Backend (Node/Express)
+- MSW intercepte toutes les requêtes `/api/sessions`
+- Les données sont mockées en mémoire
+- Fonctionne aussi en **mode offline** (PWA)
+- Parfait pour les démos et tests
 
+### Option 2 : Mode Backend (Express réel)
+
+Si vous voulez utiliser le backend Node/Express :
+
+**Terminal 1 - Backend :**
 ```bash
 cd backend
-npm init -y
-npm install express cors
+npm install
 npm start
 ```
-
 L'API démarre sur `http://localhost:5000`
+
+**Terminal 2 - Frontend :**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Accédez à **`http://localhost:5173`** (SANS paramètre `?msw=on`)
+
+- Le frontend proxy `/api/sessions` vers le backend Express (Vite proxy configuré)
+- Les données viennent du serveur Node.js
+- Simulez une coupure réseau dans DevTools pour voir la gestion d'erreur
+
+### Option 3 : Build & Production (npm run preview)
+
+Pour tester en mode production (PWA, service worker) :
+
+```bash
+cd frontend
+npm install
+npm run build
+npm run preview
+```
+
+Accédez à **`http://localhost:4173/?msw=on`**
+
+- PWA en mode offline
+- Service worker active
+- MSW active (avec le paramètre `?msw=on`)
 
 ### Tests unitaires
 
@@ -50,7 +86,7 @@ npm test                      # Mode watch
 npm run test:ui               # Interface Vitest UI
 ```
 
-**Résultat : 31 tests passent ✅**
+**Résultat : 31 tests passent**
 
 Tests inclus :
 - `session.test.js` : Modèle et validation des sessions
@@ -87,26 +123,44 @@ DELETE /api/sessions/:id   → Supprimer une session
 
 ### Mode Mock (MSW - Partie B)
 
-Le frontend fonctionne **sans backend** grâce à MSW.
+**MSW (Mock Service Worker)** intercepte toutes les requêtes `/api/sessions` et les traite côté navigateur, sans besoin de backend.
 
-- Les handlers MSW capturent tous les appels fetch
-- Les données persistent en mémoire
-- Mode mock activé automatiquement
+**Quand utiliser MSW** :
+- Développement sans backend
+- Tests automatisés
+- Démos et présentations
+- Mode offline (PWA)
+
+**Comment activer MSW** :
+- Accédez à l'URL avec le paramètre : **`?msw=on`**
+- Exemple : `http://localhost:5173/?msw=on`
+
+**Handlers MSW implémentés** :
+- `GET /api/sessions` → retourne la liste mock
+- `POST /api/sessions` → ajoute une session mock
+- `PATCH /api/sessions/:id` → modifie une session mock
+- `DELETE /api/sessions/:id` → supprime une session mock
+
+**Sans MSW** (parameter `?msw=on` absent) :
+- Le frontend appelle `/api/sessions` via le proxy Vite
+- Il faut avoir le backend lancé en parallèle
+- Sinon : erreur "Erreur lors du chargement des séances"
+
+
 
 ### PWA (Partie C)
 
 - `manifest.webmanifest` : Installation sur écran d'accueil
-- `service-worker.js` : Cache des assets statiques
+- `service-worker.js` : Cache des assets statiques (stratégie cache-first)
 - Icônes 128×192×512px
 
-Pour tester offline :
+**Test offline** :
 ```bash
-cd frontend
 npm run build
 npm run preview
 ```
 
-Puis dans DevTools → Application → Service Worker → passer Offline
+Puis ouvrez DevTools → Application → Service Worker et cochez "Offline" pour tester sans connexion.
 
 ## Architecture
 

@@ -12,7 +12,9 @@ Quand on clique sur le bouton "Ajouter la session" du formulaire, voici ce qui s
 
 2. **React (Board.jsx)** : L'événement `onAdd` est appelé avec cet objet. Board crée un appel fetch vers `POST /api/sessions` avec les données JSON.
 
-3. **API (MSW par défaut)** : Si MSW est actif (par défaut), le handler MSW intercepte l'appel, ajoute un ID unique, et retourne la session créée. Si le backend tourne, c'est Express qui reçoit la requête, génère l'ID, la stocke en mémoire, et retourne la session.
+3. **API (MSW ou Backend)** : 
+   - **Si MSW est activé** (`?msw=on` dans l'URL) : le handler MSW intercepte l'appel, ajoute un ID unique, et retourne la session créée en mémoire.
+   - **Si MSW est désactivé** : c'est Express (backend) qui reçoit la requête via le proxy Vite, génère l'ID, la stocke en mémoire, et retourne la session.
 
 4. **React (Board.jsx)** : La réponse arrive, React ajoute la session au state avec `setSessions`. Le composant se re-rend, et la nouvelle carte apparaît dans la colonne "À faire".
 
@@ -26,9 +28,9 @@ Quand on clique sur le bouton "Ajouter la session" du formulaire, voici ce qui s
 
 Si le backend est down ou il y a une coupure réseau, voici comment on gère :
 
-**MSW est actif (par défaut)** : Comme MSW simule l'API côté client, aucun problème. Les sessions continuent de fonctionner normalement puisqu'elles sont mockées en mémoire.
+**MSW est activé** (`?msw=on`) : Comme MSW simule l'API côté client, aucun problème. Les sessions continuent de fonctionner normalement puisqu'elles sont mockées en mémoire.
 
-**MSW est désactivé et le backend down** : 
+**MSW est désactivé (par défaut) et le backend down** : 
 
 - Dans `Board.jsx`, les appels fetch sont wrappés dans des `try/catch`. 
 - Si ça échoue, on affiche un message d'erreur rouge en haut : "Impossible d'ajouter la séance. Vérifiez votre connexion."
@@ -86,9 +88,11 @@ it('devrait compter les sessions par statut', () => {
 
 ## Résumé général
 
-**Architecture** : Formulaire → React → Fetch → (MSW/Backend) → State → Rendu
+**Architecture** : Formulaire → React → Fetch → (MSW si `?msw=on` / Backend sinon) → State → Rendu
 
-**Mode dégradé** : MSW par défaut (zéro souci). Sinon, erreurs affichées, données persistantes.
+**Mode dégradé** : 
+- Avec `?msw=on` → MSW active, zéro souci, fonctionne offline
+- Sans `?msw=on` → appel backend via proxy Vite. Si le backend est down → erreurs affichées, données persistantes
 
 **Tests** : 31 tests unitaires qui valident la logique métier (filtrage, comptage, validation). Rapides, fiables, critiques.
 - Vérifie la logique métier core : les filtres doivent isoler les bonnes sessions
