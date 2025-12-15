@@ -6,21 +6,9 @@ Réponses aux questions de compréhension du projet StudyBoard.
 
 ## 1. Architecture : Flux complet du bouton "Ajouter une séance"
 
-Quand on clique sur le bouton "Ajouter la session" du formulaire, voici ce qui se passe :
+Quand on clique sur "Ajouter la session" : le formulaire valide les champs et crée un objet session. Board.jsx reçoit cet objet et fait un `fetch POST /api/sessions`. MSW (si `?msw=on`) ou le backend Express reçoit la requête, génère un ID, et retourne la session. React met à jour le state avec `setSessions`, le composant se re-rend, et la carte apparaît dans la colonne "À faire". Le formulaire se vide automatiquement pour preparer le prochain ajout.
 
-1. **React (AddSessionForm.jsx)** : Le formulaire valide les champs (titre obligatoire) et crée un objet avec tous les champs : titre, matière, CM, difficulté, date d'échéance, XP, et status "todo".
-
-2. **React (Board.jsx)** : L'événement `onAdd` est appelé avec cet objet. Board crée un appel fetch vers `POST /api/sessions` avec les données JSON.
-
-3. **API (MSW ou Backend)** : 
-   - **Si MSW est activé** (`?msw=on` dans l'URL) : le handler MSW intercepte l'appel, ajoute un ID unique, et retourne la session créée en mémoire.
-   - **Si MSW est désactivé** : c'est Express (backend) qui reçoit la requête via le proxy Vite, génère l'ID, la stocke en mémoire, et retourne la session.
-
-4. **React (Board.jsx)** : La réponse arrive, React ajoute la session au state avec `setSessions`. Le composant se re-rend, et la nouvelle carte apparaît dans la colonne "À faire".
-
-5. **AddSessionForm.jsx** : Le formulaire se vide automatiquement pour préparer le prochain ajout.
-
-**Résumé** : Click → Formulaire valide → Fetch POST → (MSW OU Backend) → State update → Rendu React → Nouvelle carte visible.
+**Donc** : Click → Formulaire valide → Fetch POST → (MSW OU Backend) → State update → Rendu React → Nouvelle carte visible.
 
 ---
 
@@ -95,7 +83,6 @@ it('devrait compter les sessions par statut', () => {
 - Test une pure function (pas de dépendance à React/API)
 - Si on refactorise `filterSessions()`, ce test détecte les bugs immédiatement
 - Couvre un cas d'usage réel : "je veux voir que mes sessions PWA"
-
-**Objectif** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. 
+- Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. 
 
 
