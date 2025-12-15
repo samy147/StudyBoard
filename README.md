@@ -22,7 +22,7 @@ Idéal pour développer et tester sans serveur :
 
 ```bash
 cd frontend
-npm install
+npm install   # Si conflit de dépendances : npm install --legacy-peer-deps
 npm run dev
 ```
 
@@ -40,7 +40,7 @@ Si vous voulez utiliser le backend Node/Express :
 **Terminal 1 - Backend :**
 ```bash
 cd backend
-npm install
+npm install 
 npm start
 ```
 L'API démarre sur `http://localhost:5000`
@@ -48,7 +48,7 @@ L'API démarre sur `http://localhost:5000`
 **Terminal 2 - Frontend :**
 ```bash
 cd frontend
-npm install
+npm install   # Si conflit de dépendances : npm install --legacy-peer-deps
 npm run dev
 ```
 
@@ -64,7 +64,7 @@ Pour tester en mode production (PWA, service worker) :
 
 ```bash
 cd frontend
-npm install
+npm install   # Si conflit de dépendances : npm install --legacy-peer-deps
 npm run build
 npm run preview
 ```
@@ -80,19 +80,22 @@ Accédez à **`http://localhost:4173/?msw=on`**
 Depuis la racine du projet :
 
 ```bash
+# À la racine (une seule fois)
 npm install
+
+# Puis exécuter les tests
 npm run test:run              # Lancer tous les tests une fois
-npm test                      # Mode watch
-npm run test:ui               # Interface Vitest UI
+npm test                      # Mode watch (relance à chaque sauvegarde)
+npm run test:ui               # Interface Vitest UI (meilleure expérience)
 ```
 
-**Résultat : 31 tests passent**
+**Résultat : 31 tests passent ✅**
 
 Tests inclus :
-- `session.test.js` : Modèle et validation des sessions
-- `utils.test.js` : Filtrage et statistiques
-- `card.test.js` : Données des cartes
-- `form.test.js` : Validation du formulaire
+- `session.test.js` : Modèle et validation des sessions (11 tests)
+- `utils.test.js` : Filtrage et statistiques (11 tests)
+- `card.test.js` : Données des cartes (4 tests)
+- `form.test.js` : Validation du formulaire (7 tests)
 
 ## Fonctionnalités
 
