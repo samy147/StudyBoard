@@ -44,8 +44,6 @@ Si le backend est down ou il y a une coupure réseau, voici comment on gère :
 - L'app reste fonctionnelle visuellement, mais les actions fetch (ajouter, modifier, supprimer) failleront.
 - On pourrait ajouter un localStorage pour persister les nouvelles données en offline, mais actuellement, c'est MSW qui gère.
 
-**Conclusion** : MSW par défaut = zéro souci. Backend down = messages d'erreur clairs et données persistantes.
-
 ---
 
 ## 3. Tests / Qualité : Un exemple utile
@@ -82,8 +80,6 @@ it('devrait compter les sessions par statut', () => {
 3. C'est une fonction métier simple mais critique : si elle est cassée, les stats sont fausses et ça gâche l'UX.
 4. Le test est léger et rapide (moins de 1ms), donc on peut le lancer en continu sans ralentir le dev.
 
-**En général** : On teste les fonctions de logique métier (filtrage, comptage, calcul de pourcentage) plutôt que les détails de rendu React. Ça capture les bugs dans l'algorithme avant qu'ils ne se retrouvent en production.
-
 ---
 
 ## Résumé général
@@ -100,9 +96,8 @@ it('devrait compter les sessions par statut', () => {
 - Si on refactorise `filterSessions()`, ce test détecte les bugs immédiatement
 - Couvre un cas d'usage réel : "je veux voir que mes sessions PWA"
 
-**Impact** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. C'est critiqué en priorité avant le déploiement.
+**Impact** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. 
 
-**Autres tests importants** : Comptage par statut, calcul progression (barre). Les 33 tests couvrent les transformations de données, validation de modèle, et logique métier.
 
 ---
 
