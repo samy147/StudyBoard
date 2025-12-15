@@ -96,9 +96,6 @@ it('devrait compter les sessions par statut', () => {
 - Si on refactorise `filterSessions()`, ce test détecte les bugs immédiatement
 - Couvre un cas d'usage réel : "je veux voir que mes sessions PWA"
 
-**Impact** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. 
+**Objectif** : Ce test m'assure que les utilisateurs ne voient que ce qu'ils cherchent. 
 
 
----
-
-**Conclusion** : Le projet suit une architecture claire frontend/backend/mock, gère les erreurs gracieusement, et est couvert par des tests unitaires solides testant la logique métier avant tout.
