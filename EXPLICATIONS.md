@@ -61,7 +61,7 @@ it('devrait compter les sessions par statut', () => {
 });
 ```
 
-**Pourquoi c'est important** : 
+**Pourquoi c'est important**  : 
 
 1. Ce test valide la logique exacte utilisée par `StatsPanel` pour afficher les compteurs et la barre de progression.
 2. Si quelqu'un change accidentellement le filtre ou la logique de comptage, le test échoue immédiatement.
